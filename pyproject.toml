@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.7"
 omegaconf = "^2.0.6"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 black = "^22.10.0"
 
 [build-system]
