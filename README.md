@@ -3,7 +3,7 @@ Integration between Omegaconf and argparse for mixed config file and CLI argumen
 
 Flexible configuration management is important during experimentation, e.g. when training machine learning models.
 
-Ideally, we want both a configuration file to hold more "stable" hyperparameter values and the flexibility to 
+Ideally, we want both a configuration file to hold more "stable" hyperparameter values and the flexibility to
 change values through command line arguments for rapid experimentation.
 
 ## How it works

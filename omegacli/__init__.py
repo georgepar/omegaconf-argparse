@@ -3,6 +3,7 @@ import pathlib
 import sys
 from collections import defaultdict
 from typing import IO, Any, Dict, List, Optional, Tuple, Union
+
 import omegaconf
 from omegaconf import DictConfig, ListConfig
 
