@@ -171,7 +171,9 @@ def parse_config(
     else:
         dict_config = OmegaConf.create({})
 
-    user_cli, default_cli = OmegaConf.from_argparse(parser, include_none=include_none, args=args)
+    user_cli, default_cli = OmegaConf.from_argparse(
+        parser, include_none=include_none, args=args
+    )
     config = OmegaConf.merge(default_cli, dict_config, user_cli)
 
     logger.info("Running with the following configuration")
