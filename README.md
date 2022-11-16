@@ -13,6 +13,13 @@ This package provides a barebones solution based on the excellent [OmegaConf](ht
 Specifically, we extend the `OmegaConf` class with a static `from_argparse` method to parse arguments provided using argparse,
 and provide utility functions to merge the default CLI values, YAML configuration file values and user provided CLI arguments.
 
+# Installation
+
+Install package from PyPi:
+
+```
+pip install omegaconf-argparse
+```
 
 ## Usage
 
