@@ -20,6 +20,12 @@ Install package from PyPi:
 pip install omegaconf-argparse
 ```
 
+Then in your code you can import:
+
+```
+from omegacli import OmegaConf, generate_config_template, parse_config
+```
+
 ## Usage
 
 Let's start with an example. You have an argparse based script, and you want to move to a more reproducible setup
@@ -29,7 +35,7 @@ In `examples/mnist.py` we have modified the example MNIST training script from [
 
 The diff is:
 
-```
+```diff
 11a12,13
 > from omegacli import generate_config_template, parse_config
 >
@@ -61,7 +67,7 @@ Note we have added two command line arguments `--generate-config` and `--config-
 
 When we run
 
-```
+```bash
 python mnist.py --generate-config --config-path config.yaml
 ```
 
@@ -107,7 +113,7 @@ When we are confident with our experiments we can set the best hyperparameter va
 
 We provide a high-level utility function `parse_config` that merges a YAML configuration file with an `argparse.ArgumentParser`:
 
-```
+```python
 import io
 from omegacli import parse_config
 mock_config_file = io.StringIO('''
@@ -131,7 +137,7 @@ cfg = parse_config(parser, mock_config_file)
 
 You can also use the patched `OmegaConf` class directly:
 
-```
+```python
 import argparse
 from omegacli import OmegaConf
 parser = argparse.ArgumentParser("My cool model")
@@ -169,13 +175,13 @@ Specifically, we follow the convention that the destination is a string, delimit
 
 For example:
 
-```
+```python
 parser.add_argument("--hidden", dest="model_hidden", type=int, default=20)
 ```
 
 will create a top-level element in the configuration:
 
-```
+```python
 user_provided_args, default_args = OmegaConf.from_argparse(parser, args=["--hidden", "100"])
 user_provided_args
 >>> {'model_hidden': 100}
@@ -183,19 +189,19 @@ user_provided_args
 
 This will match with the following entry in the YAML file:
 
-```
+```yaml
 model_hidden: 100
 ```
 
 The following:
 
-```
+```python
 parser.add_argument("--hidden", dest="model.hidden", type=int, default=20)
 ```
 
 will create a nested structure in the configuration:
 
-```
+```python
 user_provided_args, default_args = OmegaConf.from_argparse(parser, args=["--hidden", "100"])
 user_provided_args
 >>> {'model': {'hidden': 100}}
@@ -203,7 +209,7 @@ user_provided_args
 
 and will match with the following YAML entry:
 
-```
+```yaml
 model:
   hidden: 100
 ```
@@ -214,7 +220,7 @@ The parsing is recursive, so you can go as deep as you want.
 
 Run:
 
-```
+```python
 from omegacli import generate_config_template
 generate_config_template(parser, "example-config.yaml")
 ```
