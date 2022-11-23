@@ -160,7 +160,7 @@ default_args
 
 The precedence for merging is as follows
 
-- default cli args values < config file values < user provided cli args
+- user provided cli args >  config file values > default cli args values 
 
 E.g.:
 
