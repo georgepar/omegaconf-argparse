@@ -175,10 +175,13 @@ def parse_config(
     user_cli, default_cli = OmegaConf.from_argparse(
         parser, include_none=include_none, args=args
     )
-    config = OmegaConf.merge(default_cli, dict_config, user_cli)
 
-    logger.info("Running with the following configuration")
-    logger.info(f"\n{OmegaConf.to_yaml(config)}")
+    tomerge = [
+        cfg
+        for cfg in [default_cli, dict_config, user_cli]
+        if cfg is not None and len(cfg.keys()) > 0
+    ]
+    config = OmegaConf.merge(*tomerge)
 
     return config
 

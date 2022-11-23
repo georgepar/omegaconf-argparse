@@ -1,4 +1,5 @@
 # omegaconf-argparse
+
 Integration between Omegaconf and argparse for mixed config file and CLI arguments
 
 Flexible configuration management is important during experimentation, e.g. when training machine learning models.
@@ -71,12 +72,62 @@ default_args
 ## Merging of provided values
 
 The precedence for merging is as follows
-* default cli args values < config file values < user provided cli args
+
+- default cli args values < config file values < user provided cli args
 
 E.g.:
-* if you don't include a value in your configuration it will take the default value from the argparse arguments
-* if you provide a cli arg (e.g. run the script with --bsz 64) it will override the value in the config file
 
+- if you don't include a value in your configuration it will take the default value from the argparse arguments
+- if you provide a cli arg (e.g. run the script with --bsz 64) it will override the value in the config file
+
+### Conventions
+
+To create a nested configuration structure and match with the argparse provided CLI args,
+we use the `dest` kwarg when adding an argument with `parser.add_argument`.
+Specifically, we follow the convention that the destination is a string, delimited by `.` to indicate nested structure.
+
+For example:
+
+```
+parser.add_argument("--hidden", dest="model_hidden", type=int, default=20)
+```
+
+will create a top-level element in the configuration:
+
+```
+user_provided_args, default_args = OmegaConf.from_argparse(parser, args=["--hidden", "100"])
+user_provided_args
+>>> {'model_hidden': 100}
+```
+
+This will match with the following entry in the YAML file:
+
+```
+model_hidden: 100
+```
+
+The following:
+
+```
+parser.add_argument("--hidden", dest="model.hidden", type=int, default=20)
+```
+
+will create a nested structure in the configuration:
+
+```
+user_provided_args, default_args = OmegaConf.from_argparse(parser, args=["--hidden", "100"])
+user_provided_args
+>>> {'model': {'hidden': 100}}
+```
+
+and will match with the following YAML entry:
+
+```
+model:
+  hidden: 100
+```
+
+The parsing is recursive, so you can go as deep as you want.
 
 ## Generate a configuration file based on an argument parser
 
@@ -92,8 +143,8 @@ You can use this as a starting point for saving and editing your configuration.
 
 ## Similar solutions
 
-* [Hydra](https://hydra.cc/docs/intro/): A more feature-rich, but more complex solution. If you are willing to introduce the dependency you can use it
-* [Pytorch-Lightning](https://pytorch-lightning.readthedocs.io/en/1.6.2/common/lightning_cli.html): PL introduced a similar functionality. You can use it if you are in the PL ecosystem.
+- [Hydra](https://hydra.cc/docs/intro/): A more feature-rich, but more complex solution. If you are willing to introduce the dependency you can use it
+- [Pytorch-Lightning](https://pytorch-lightning.readthedocs.io/en/1.6.2/common/lightning_cli.html): PL introduced a similar functionality. You can use it if you are in the PL ecosystem.
 
 ## Why create a separate package?
 
