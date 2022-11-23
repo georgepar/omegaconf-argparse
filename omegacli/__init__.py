@@ -126,6 +126,7 @@ def parse_config(
     config_file: Optional[Union[str, IO]],
     args: Optional[List[str]] = None,
     include_none: bool = False,
+    use_only_default: bool = False,
 ) -> Union[ListConfig, DictConfig]:
     """parse_config Parse a provided YAML config file and command line args and merge them
     During experimentation we want ideally to have a configuration file with the model and training configuration,
@@ -142,6 +143,7 @@ def parse_config(
         config_file (Union[str, IO]): Configuration file name or file descriptor
         args (Optional[List[str]]): Optional input sys.argv style args. Useful for testing.
             Use this only for testing. By default it uses sys.argv[1:]
+        use_only_default (bool): Use only the default parser values. Useful for config generation
     Returns:
         OmegaConf.DictConfig: The parsed configuration as an OmegaConf DictConfig object
     Examples:
@@ -176,11 +178,11 @@ def parse_config(
         parser, include_none=include_none, args=args
     )
 
-    tomerge = [
-        cfg
-        for cfg in [default_cli, dict_config, user_cli]
-        if cfg is not None and len(cfg.keys()) > 0
-    ]
+    configs = (
+        [default_cli, dict_config, user_cli] if not use_only_default else [default_cli]
+    )
+
+    tomerge = [cfg for cfg in configs if cfg is not None and len(cfg.keys()) > 0]
     config = OmegaConf.merge(*tomerge)
 
     return config
@@ -199,5 +201,5 @@ def generate_config_template(
         args (Optional[List[str]]): Optional input sys.argv style args. Useful for testing.
             Use this only for testing. By default it uses sys.argv[1:]
     """
-    config = parse_config(parser, None, include_none=True)
+    config = parse_config(parser, None, include_none=True, use_only_default=True)
     OmegaConf.save(config, output_file)
