@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omegaconf_argparse"
-version = "1.0.0"
+version = "1.0.1"
 description = "Integration between Omegaconf and argparse for mixed config file and CLI arguments"
 authors = ["Giorgos Paraskevopoulos <georgepar.91@gmail.com>"]
 license = "Apache-2.0"
