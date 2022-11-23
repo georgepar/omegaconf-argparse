@@ -7,8 +7,6 @@ Flexible configuration management is important during experimentation, e.g. when
 Ideally, we want both a configuration file to hold more "stable" hyperparameter values and the flexibility to
 change values through command line arguments for rapid experimentation.
 
-## How it works
-
 This package provides a barebones solution based on the excellent [OmegaConf](https://github.com/omry/omegaconf) package.
 
 Specifically, we extend the `OmegaConf` class with a static `from_argparse` method to parse arguments provided using argparse,
@@ -23,6 +21,89 @@ pip install omegaconf-argparse
 ```
 
 ## Usage
+
+Let's start with an example. You have an argparse based script, and you want to move to a more reproducible setup
+based on configuration files, without losing the flexibility of cli arguments.
+
+In `examples/mnist.py` we have modified the example MNIST training script from [pytorch repo](https://github.com/pytorch/examples/blob/main/mnist/main.py).
+
+The diff is:
+
+```
+11a12,13
+> from omegacli import generate_config_template, parse_config
+>
+158a161,172
+>     parser.add_argument(
+>         "--generate-config",
+>         action="store_true",
+>         default=False,
+>         help="Generate example YAML configuration file",
+>     )
+>     parser.add_argument(
+>         "--config-path",
+>         type=str,
+>         default=None,
+>         help="Path to configuration file",
+>     )
+159a174,182
+>
+>     if args.generate_config:
+>         import sys
+>
+>         generate_config_template(parser, args.config)
+>         sys.exit(0)
+>
+>     args = parse_config(parser, args.config)
+```
+
+Note we have added two command line arguments `--generate-config` and `--config-path`.
+
+When we run
+
+```
+python mnist.py --generate-config --config-path config.yaml
+```
+
+it will create a `config.yaml` file, which can be used from now on:
+
+```yaml
+batch_size: 64
+test_batch_size: 1000
+epochs: null
+lr: 1.0
+gamma: 0.7
+no_cuda: false
+no_mps: false
+dry_run: false
+seed: 1
+log_interval: 10
+save_model: false
+```
+
+Now if we run:
+
+```
+python mnist.py --config config.yaml
+```
+
+The script will use the values provided in the `config.yaml` file. If we change the configuration:
+
+```yaml
+lr: 0.1
+```
+
+The training will use `lr=0.1`.
+
+At any time we can run a quick experiment (let's say with `gamma=1.0`) and override the config values using the CLI:
+
+```
+python mnist.py --config config.yaml --gamma 1.0
+```
+
+When we are confident with our experiments we can set the best hyperparameter values in the configuration file and push to a remote repo for reproducibility.
+
+## How it works
 
 We provide a high-level utility function `parse_config` that merges a YAML configuration file with an `argparse.ArgumentParser`:
 
